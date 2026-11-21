@@ -1,17 +1,19 @@
 // Généré par scripts/sw-build.mjs
-const CACHE = 'readlab-d16ff39b3e3b';
+const CACHE = 'readlab-ff098db0c1f0';
 // Moteur OCR (≈5 Mo) : mis en cache à la première utilisation seulement, conservé entre les versions.
-const OCR_CACHE = 'readlab-ocr-2'; // à incrémenter à chaque changement de version du moteur
-const FILES = ["./","assets/esm-q73noGxA.js","assets/index-BSduIh9P.css","assets/index-CV9_hCwS.js","assets/src-lj6Y1Ldw.js","icon-180.png","icon-512.png","index.html","manifest.webmanifest"];
+const OCR_CACHE = 'readlab-ocr-2';
+// Transcription vocale (≈100 Mo) : idem, téléchargée à la première note vocale seulement.
+const ASR_CACHE = 'readlab-asr-1'; // à incrémenter à chaque changement de version du moteur
+const FILES = ["./","assets/asr.worker-Circl8xM.js","assets/esm-q73noGxA.js","assets/index-CEE4yvCm.css","assets/index-CwjRJTde.js","assets/src-IRauWaD2.js","icon-180.png","icon-512.png","index.html","manifest.webmanifest"];
 self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES.map(f => new Request(f, { cache: 'reload' })))).then(() => self.skipWaiting())));
 self.addEventListener('activate', e => e.waitUntil(caches.keys()
-  .then(k => Promise.all(k.filter(n => n.startsWith('readlab-') && n !== CACHE && n !== OCR_CACHE).map(n => caches.delete(n))))
+  .then(k => Promise.all(k.filter(n => n.startsWith('readlab-') && n !== CACHE && n !== OCR_CACHE && n !== ASR_CACHE).map(n => caches.delete(n))))
   .then(() => self.clients.claim())));
 self.addEventListener('fetch', e => {
   const u = new URL(e.request.url);
   if (e.request.method !== 'GET' || u.origin !== location.origin) return;
-  if (u.pathname.includes('/ocr/')) {
-    e.respondWith(caches.open(OCR_CACHE).then(c => c.match(e.request).then(r => r || fetch(e.request).then(res => { if (res.ok) c.put(e.request, res.clone()); return res; }))));
+  if (u.pathname.includes('/ocr/') || u.pathname.includes('/asr/') || u.pathname.endsWith('.wasm')) {
+    e.respondWith(caches.open(u.pathname.includes('/ocr/') ? OCR_CACHE : ASR_CACHE).then(c => c.match(e.request).then(r => r || fetch(e.request).then(res => { if (res.ok) c.put(e.request, res.clone()); return res; }))));
     return;
   }
   // Navigation : toujours l'app en cache (fonctionne hors ligne, routes par #).
