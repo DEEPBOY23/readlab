@@ -1,6 +1,6 @@
 // Généré par scripts/sw-build.mjs
-const CACHE = 'readlab-f24f77697f7e';
-const FILES = ["./","assets/index-C7fTOe4t.css","assets/index-DT9DdRZZ.js","icon-180.png","icon-512.png","index.html","manifest.webmanifest"];
+const CACHE = 'readlab-363c0b08541e';
+const FILES = ["./","assets/index-BYcnVr7v.js","assets/index-CHwMRZoW.css","icon-180.png","icon-512.png","index.html","manifest.webmanifest"];
 self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES.map(f => new Request(f, { cache: 'reload' })))).then(() => self.skipWaiting())));
 self.addEventListener('activate', e => e.waitUntil(caches.keys()
   .then(k => Promise.all(k.filter(n => n.startsWith('readlab-') && n !== CACHE).map(n => caches.delete(n))))
