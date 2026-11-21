@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>READLAB essai</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="READLAB essai">
+<meta name="theme-color" content="#1f2a24">
+<style>
+  :root { color-scheme: light dark; --bg:#f7f5ef; --fg:#1f2a24; --muted:#6b6f68; --ok:#2e7d4f; --ko:#b23a2e; --card:#fff; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#141714; --fg:#ece9e0; --muted:#9a9d95; --card:#1e221e; } }
+  body { margin:0; padding:16px; padding-top:max(16px, env(safe-area-inset-top)); background:var(--bg); color:var(--fg); font:16px/1.45 -apple-system, system-ui, sans-serif; }
+  h1 { font-size:1.3rem; margin:0 0 4px } h2 { font-size:1.05rem; margin:0 0 8px }
+  section { background:var(--card); border-radius:12px; padding:14px; margin:12px 0; }
+  .row { display:flex; justify-content:space-between; gap:12px; padding:4px 0; border-bottom:1px solid #8882; }
+  .row span:last-child { text-align:right; font-weight:600 }
+  .ok { color:var(--ok) } .ko { color:var(--ko) } small { color:var(--muted) }
+  button, input { font:inherit; padding:10px 12px; border-radius:10px; border:1px solid #8886; margin:4px 0; width:100%; box-sizing:border-box; }
+  button { background:var(--fg); color:var(--bg); border:none; }
+  pre { white-space:pre-wrap; word-break:break-word; font-size:.85rem; background:#8881; padding:8px; border-radius:8px; }
+</style>
+</head>
+<body>
+<h1>READLAB — essai technique</h1>
+<small id="version"></small>
+
+<section>
+  <h2>S1 · Installation et stockage</h2>
+  <div class="row"><span>Ouverte depuis l'écran d'accueil</span><span id="standalone">…</span></div>
+  <div class="row"><span>Fonctionnement hors ligne prêt</span><span id="sw">…</span></div>
+  <div class="row"><span>Stockage persistant accordé</span><span id="persist">…</span></div>
+  <div class="row"><span>Espace utilisé / disponible</span><span id="quota">…</span></div>
+  <div class="row"><span>Nombre d'ouvertures</span><span id="opens">…</span></div>
+  <div class="row"><span>Première ouverture</span><span id="first">…</span></div>
+  <div class="row"><span>Réseau</span><span id="net">…</span></div>
+  <button id="btnPersist">Demander le stockage persistant</button>
+  <label><small>Note de test (doit survivre à la fermeture et au mode Avion)</small>
+  <input id="note" placeholder="Écris un mot ici"></label>
+  <button id="btnBig">Écrire un fichier test de 20 Mo</button>
+  <pre id="s1log"></pre>
+</section>
+
+<section>
+  <h2>S2 · Compagnon sur l'ordinateur</h2>
+  <label><small>Adresse du compagnon</small>
+  <input id="addr" placeholder="https://nom-du-mac.local:8443" autocapitalize="off" autocorrect="off"></label>
+  <button id="btnPing">Tester la connexion sécurisée</button>
+  <button id="btnWs">Tester le canal temps réel</button>
+  <pre id="s2log"></pre>
+</section>
+
+<script>
+const VERSION = 'essai-0.1';
+const $ = id => document.getElementById(id);
+const yes = (el, v, t, f) => { el.textContent = v ? t : f; el.className = v ? 'ok' : 'ko'; };
+const log = (id, m) => { $(id).textContent = new Date().toLocaleTimeString('fr-FR') + '  ' + m + '\n' + $(id).textContent; };
+$('version').textContent = 'Version ' + VERSION;
+
+// --- IndexedDB minimal ---
+function db() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('readlab-essai', 1);
+    r.onupgradeneeded = () => { r.result.createObjectStore('kv'); r.result.createObjectStore('blobs'); };
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+async function op(store, mode, fn) {
+  const d = await db();
+  return new Promise((res, rej) => {
+    const tx = d.transaction(store, mode); const s = tx.objectStore(store);
+    const req = fn(s); tx.oncomplete = () => res(req && req.result); tx.onerror = () => rej(tx.error);
+  });
+}
+const get = k => op('kv', 'readonly', s => s.get(k));
+const put = (k, v) => op('kv', 'readwrite', s => s.put(v, k));
+
+async function refreshStorage() {
+  if (navigator.storage?.persisted) yes($('persist'), await navigator.storage.persisted(), 'oui', 'non');
+  else $('persist').textContent = 'non pris en charge';
+  if (navigator.storage?.estimate) {
+    const e = await navigator.storage.estimate();
+    $('quota').textContent = (e.usage/1e6).toFixed(1) + ' Mo / ' + (e.quota/1e9).toFixed(1) + ' Go';
+  }
+}
+
+(async () => {
+  yes($('standalone'), navigator.standalone || matchMedia('(display-mode: standalone)').matches, 'oui', 'non (Safari)');
+  const upd = () => yes($('net'), navigator.onLine, 'en ligne', 'hors ligne');
+  upd(); addEventListener('online', upd); addEventListener('offline', upd);
+
+  const opens = (await get('opens') || 0) + 1; await put('opens', opens); $('opens').textContent = opens;
+  let first = await get('first'); if (!first) { first = new Date().toISOString(); await put('first', first); }
+  $('first').textContent = new Date(first).toLocaleString('fr-FR');
+  $('note').value = await get('note') || '';
+  $('addr').value = await get('addr') || '';
+  $('addr').addEventListener('change', e => put('addr', e.target.value.trim()));
+  $('note').addEventListener('input', e => put('note', e.target.value));
+  await refreshStorage();
+
+  if ('serviceWorker' in navigator) {
+    await navigator.serviceWorker.register('sw.js');
+    const r = await navigator.serviceWorker.ready;
+    yes($('sw'), !!r.active, 'oui', 'non');
+  } else $('sw').textContent = 'non pris en charge';
+})().catch(e => log('s1log', 'Erreur : ' + e));
+
+$('btnPersist').onclick = async () => {
+  if (!navigator.storage?.persist) return log('s1log', 'persist() non pris en charge');
+  log('s1log', 'persist() → ' + await navigator.storage.persist()); refreshStorage();
+};
+$('btnBig').onclick = async () => {
+  try {
+    const bytes = new Uint8Array(20e6); crypto.getRandomValues(bytes.subarray(0, 65536));
+    const t = performance.now();
+    await op('blobs', 'readwrite', s => s.put(new Blob([bytes]), 'test-' + Date.now()));
+    log('s1log', '20 Mo écrits en ' + Math.round(performance.now() - t) + ' ms'); refreshStorage();
+  } catch (e) { log('s1log', 'Écriture refusée : ' + e.name + ' ' + e.message); }
+};
+
+// --- S2 ---
+$('btnPing').onclick = async () => {
+  const a = $('addr').value.replace(/\/$/, '');
+  try {
+    const t = performance.now();
+    const r = await fetch(a + '/ping', { cache: 'no-store' });
+    log('s2log', 'OK ' + Math.round(performance.now() - t) + ' ms → ' + JSON.stringify(await r.json()));
+  } catch (e) { log('s2log', 'Échec : ' + e.name + ' ' + e.message + '\n(certificat non approuvé, compagnon éteint, ou réseau isolé)'); }
+};
+$('btnWs').onclick = () => {
+  const a = $('addr').value.replace(/^https/, 'wss').replace(/\/$/, '');
+  const ws = new WebSocket(a + '/ws'); const t = performance.now();
+  ws.onopen = () => ws.send('bonjour ' + Date.now());
+  ws.onmessage = e => { log('s2log', 'WebSocket OK ' + Math.round(performance.now() - t) + ' ms → ' + e.data); ws.close(); };
+  ws.onerror = () => log('s2log', 'WebSocket échec');
+};
+</script>
+</body>
+</html>
