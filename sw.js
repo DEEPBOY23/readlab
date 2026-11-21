@@ -1,8 +1,8 @@
 // Généré par scripts/sw-build.mjs
-const CACHE = 'readlab-9a5d9f4f5803';
+const CACHE = 'readlab-baddb86700d5';
 // Moteur OCR (≈5 Mo) : mis en cache à la première utilisation seulement, conservé entre les versions.
 const OCR_CACHE = 'readlab-ocr-2'; // à incrémenter à chaque changement de version du moteur
-const FILES = ["./","assets/esm-q73noGxA.js","assets/index-CQBv-NfL.js","assets/index-Dz1Pgvg1.css","assets/src-DaRUYAGb.js","icon-180.png","icon-512.png","index.html","manifest.webmanifest"];
+const FILES = ["./","assets/esm-q73noGxA.js","assets/index-BcKfSK2z.js","assets/index-DEp5tBWc.css","assets/src-CFmUi2J8.js","icon-180.png","icon-512.png","index.html","manifest.webmanifest"];
 self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES.map(f => new Request(f, { cache: 'reload' })))).then(() => self.skipWaiting())));
 self.addEventListener('activate', e => e.waitUntil(caches.keys()
   .then(k => Promise.all(k.filter(n => n.startsWith('readlab-') && n !== CACHE && n !== OCR_CACHE).map(n => caches.delete(n))))
