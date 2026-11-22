@@ -10,14 +10,22 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="READLAB">
-  <meta name="theme-color" content="#0A120F">
+  <meta name="theme-color" content="#05130d">
 
-  <script type="module" crossorigin src="/readlab/assets/index-CrkU9znZ.js"></script>
+  <style>html,body{background:#07120e}#splash{z-index:1000;background:#07120e;transition:opacity .45s;position:fixed;inset:0;overflow:hidden}#splash.done{opacity:0;pointer-events:none}.sp-bg{will-change:transform;background:url(/readlab/splash-bg.webp) 50%/cover no-repeat;position:absolute;inset:-5%}.sp-base{animation:2.6s both sp-base}.sp-green{mix-blend-mode:screen;opacity:0;animation:2.6s both sp-green;-webkit-mask-image:radial-gradient(70% 55% at 15% 12%,#000 30%,#0000 75%);mask-image:radial-gradient(70% 55% at 15% 12%,#000 30%,#0000 75%)}.sp-violet{mix-blend-mode:screen;opacity:0;animation:2.6s both sp-violet;-webkit-mask-image:radial-gradient(65% 45% at 95% 82%,#000 25%,#0000 72%);mask-image:radial-gradient(65% 45% at 95% 82%,#000 25%,#0000 72%)}@keyframes sp-base{0%{transform:scale(1.035)translate(-.6%,-.4%)}to{transform:scale(1)translate(0,0)}}@keyframes sp-green{0%{opacity:0;transform:scale(1.05)translate(-1.4%,-1%)}45%{opacity:.22}to{opacity:.14;transform:scale(1.01)translate(.3%,.2%)}}@keyframes sp-violet{0%{opacity:0;transform:scale(1.05)translate(1.2%,1%)}55%{opacity:.26}to{opacity:.16;transform:scale(1.01)translate(-.3%,-.2%)}}.sp-logo{opacity:0;border-radius:25px;width:112px;height:112px;margin:-56px 0 0 -56px;animation:.55s cubic-bezier(.2,.8,.2,1) .2s forwards sp-logo,1.6s ease-in-out .75s both sp-light;position:absolute;top:50%;left:50%;transform:scale(.96);box-shadow:0 18px 44px -14px #000000bf}@keyframes sp-logo{to{opacity:1;transform:scale(1)}}@keyframes sp-light{0%,to{filter:brightness()}50%{filter:brightness(1.06)}}.sp-word{text-align:center;letter-spacing:.45em;color:#b0ddc0;opacity:0;padding-left:.45em;font:500 11px/1 -apple-system,system-ui,sans-serif;animation:.5s .45s forwards sp-word;position:absolute;top:calc(50% + 74px);left:0;right:0}@keyframes sp-word{to{opacity:.8}}@media (prefers-reduced-motion:reduce){.sp-bg,.sp-logo,.sp-word{animation:none!important}.sp-green,.sp-violet{display:none}.sp-logo{opacity:1;transform:none}.sp-word{opacity:.8}}</style>
+  <script type="module" crossorigin src="/readlab/assets/index-s5r0-cMY.js"></script>
   <link rel="modulepreload" crossorigin href="/readlab/assets/rolldown-runtime-BCiCTKAo.js">
   <link rel="modulepreload" crossorigin href="/readlab/assets/db-D1qYuD0T.js">
   <link rel="stylesheet" crossorigin href="/readlab/assets/index-JkT7k7G_.css">
 </head>
 <body>
+  <div id="splash" aria-hidden="true">
+    <div class="sp-bg sp-base"></div><div class="sp-bg sp-green"></div><div class="sp-bg sp-violet"></div>
+    <img class="sp-logo" src="/readlab/splash-logo.png" alt="">
+    <div class="sp-word">READLAB</div>
+  </div>
+  <!-- Filet de sécurité : si le JavaScript ne démarre pas, l'écran de démarrage s'efface quand même. -->
+  <script>setTimeout(function () { var s = document.getElementById('splash'); if (s) s.classList.add('done'); }, 4000);</script>
   <div id="root"></div>
 </body>
 </html>
