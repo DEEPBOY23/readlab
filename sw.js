@@ -1,5 +1,5 @@
 // Généré par scripts/sw-build.mjs
-const CACHE = 'readlab-f5299cc0bc5f';
+const CACHE = 'readlab-d016571fc727';
 // Moteur OCR (≈5 Mo) : mis en cache à la première utilisation seulement, conservé entre les versions.
 const OCR_CACHE = 'readlab-ocr-2';
 // Transcription vocale (≈100 Mo) : idem, téléchargée à la première note vocale seulement.
