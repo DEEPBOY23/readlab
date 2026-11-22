@@ -1,10 +1,10 @@
 // Généré par scripts/sw-build.mjs
-const CACHE = 'readlab-5c1a142831cf';
+const CACHE = 'readlab-3344c30b6640';
 // Moteur OCR (≈5 Mo) : mis en cache à la première utilisation seulement, conservé entre les versions.
 const OCR_CACHE = 'readlab-ocr-2';
 // Transcription vocale (≈100 Mo) : idem, téléchargée à la première note vocale seulement.
 const ASR_CACHE = 'readlab-asr-1'; // à incrémenter à chaque changement de version du moteur
-const FILES = ["./","assets/asr.worker-Circl8xM.js","assets/esm-q73noGxA.js","assets/index-CBvniFoX.css","assets/index-CRfFgSj5.js","assets/rolldown-runtime-BCiCTKAo.js","assets/src-BmUdCsRu.js","icon-180.png","icon-512.png","index.html","manifest.webmanifest"];
+const FILES = ["./","assets/Backup-z11NcH4V.js","assets/Catchup-C1qqZR3E.js","assets/Chapters-itq67doh.js","assets/Devices-KT-4uTOa.js","assets/Feedback-CLJkSvUB.js","assets/Fiche-u44JQBIM.js","assets/MyFiches-Do23rpZj.js","assets/asr.worker-Circl8xM.js","assets/db-D1qYuD0T.js","assets/esm-q73noGxA.js","assets/fiche-repo-YW6b8Y9I.js","assets/index-BY5YXeWj.css","assets/index-D50YiLkR.js","assets/rolldown-runtime-BCiCTKAo.js","assets/src-BmUdCsRu.js","icon-180.png","icon-512.png","index.html","manifest.webmanifest"];
 self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES.map(f => new Request(f, { cache: 'reload' })))).then(() => self.skipWaiting())));
 self.addEventListener('activate', e => e.waitUntil(caches.keys()
   .then(k => Promise.all(k.filter(n => n.startsWith('readlab-') && n !== CACHE && n !== OCR_CACHE && n !== ASR_CACHE).map(n => caches.delete(n))))
